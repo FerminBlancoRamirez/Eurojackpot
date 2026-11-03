@@ -4,19 +4,24 @@ import java.util.Set;
 
 public class ServicioCliente {
 
-    public static int pedirEnteroPositivo(Scanner sc, int min, int max) {
-        int numero;
-        do {
-            while (!sc.hasNextInt()) {
-                System.out.println("Error: Debes introducir un número entero válido.");
-                sc.next();
-            }
-            numero = sc.nextInt();
-            if ((numero < min || numero > max)) {
-                System.out.println("Error: El número debe estar comprendido entre " + min + " y " + max + ". Inténtalo de nuevo.");
-            }
-        } while ((numero < min || numero > max));
+    public static int pedirSoloEntero(Scanner sc) {
+        while (!sc.hasNextInt()) {
+            System.out.println("Error: Debes introducir un número entero válido.");
+            sc.next();
+        }
+        int numero = sc.nextInt();
+        sc.nextLine();
         return numero;
+    }
+
+    public static boolean tieneFueraDeRango(int[] numeros, int min, int max) {
+        for (int numero : numeros) {
+            if (numero < min || numero > max) {
+                System.out.println("ERROR: Hay números fuera del rango permitido (" + min + " - " + max + ").");
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean tieneDuplicados(int[] numeros) {

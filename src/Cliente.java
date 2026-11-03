@@ -27,16 +27,17 @@ public class Cliente {
                 do {
                     System.out.println("Introduce numeros entre 1-50 :");
                     for (int i = 0; i < numerosCliente.length; i++) {
-                        numerosCliente[i] = ServicioCliente.pedirEnteroPositivo(sc, 1, 50);
+                        numerosCliente[i] = ServicioCliente.pedirSoloEntero(sc);
                     }
                     System.out.println("Introduce soles entre 1-12 :");
                     for (int i = 0; i < solesCliente.length; i++) {
-                        solesCliente[i] = ServicioCliente.pedirEnteroPositivo(sc, 1, 12);
+                        solesCliente[i] = ServicioCliente.pedirSoloEntero(sc);
                     }
 
-
                 } while (ServicioCliente.tieneDuplicados(numerosCliente) == true
-                        || ServicioCliente.tieneDuplicados(solesCliente) == true);
+                        || ServicioCliente.tieneDuplicados(solesCliente) == true
+                        || ServicioCliente.tieneFueraDeRango(numerosCliente, 1, 50)
+                        || ServicioCliente.tieneFueraDeRango(solesCliente, 1, 12));
 
                 Arrays.sort(numerosCliente);
 
@@ -47,15 +48,15 @@ public class Cliente {
                 for (int num : numerosCliente) {
                     dos.writeInt(num);
                 }
-                dos.flush();
-
                 dos.writeInt(solesCliente.length);
                 for (int sol : solesCliente) {
-                    dos.write(sol);
+                    dos.writeInt(sol);
                 }
+                dos.flush();
 
                 byte[] bufferEnvio = bOut.toByteArray();
-                DatagramPacket paqueteEnvio = new DatagramPacket(bufferEnvio, bufferEnvio.length, destino, puertoServidor);
+                DatagramPacket paqueteEnvio = new DatagramPacket(bufferEnvio, bufferEnvio.length, destino,
+                        puertoServidor);
                 cliente.send(paqueteEnvio);
 
                 byte[] bufferRecibo = new byte[1024];
@@ -66,17 +67,31 @@ public class Cliente {
                         StandardCharsets.UTF_8);
                 System.out.println(respuesta);
 
-                System.out.println("DESEA SALIR ? (y/n)");
+                String decision = "";
+                do {
+                    System.out.println("DESEA SALIR ? (y / n)");
 
-                while (!sc.hasNextLine()) {
-                    sc.next();
-                }
-                String decision = sc.nextLine();
+                    while (!sc.hasNextLine()) {
+                        sc.next();
+                    }
+                    decision = sc.nextLine().trim();
 
-                if (decision.toLowerCase() == "y") {
+                    if (!decision.equalsIgnoreCase("y") && !decision.equalsIgnoreCase("n")) {
+                        System.out.println("Opción no válida. Introduce y/n");
+                    }
+
+                } while (!decision.equalsIgnoreCase("y") && !decision.equalsIgnoreCase("n"));
+
+                byte[] bufferDecision = decision.getBytes(StandardCharsets.UTF_8);
+                DatagramPacket paqueteDecision = new DatagramPacket(bufferDecision, bufferDecision.length, destino,
+                        puertoServidor);
+                cliente.send(paqueteDecision);
+
+                if (decision.toLowerCase().equalsIgnoreCase("y")) {
                     System.out.println("Cerrando comunicacion");
                     break;
                 }
+
             }
 
             cliente.close();

@@ -68,24 +68,9 @@ public class ServerService {
     }
 
     // MÉTODO AÑADIDO: Permite procesar el texto recibido por el socket UDP y devolver la respuesta
-    public static String devolucionAlCliente(String tramaCliente) {
-        String[] partes = tramaCliente.split(";");
-        String[] numsStr = partes[0].split(",");
-        String[] solesStr = partes[1].split(",");
-
-        int[] numsCliente = new int[5];
-        for (int i = 0; i < 5; i++) {
-            numsCliente[i] = Integer.parseInt(numsStr[i]);
-        }
-
-        int[] solesCliente = new int[2];
-        for (int i = 0; i < 2; i++) {
-            solesCliente[i] = Integer.parseInt(solesStr[i]);
-        }
-
+    public static String devolucionAlCliente(int numsCliente[], int[] solesCliente) {
         int numCoincidencias = coincidenciasNumeros(numsCliente);
         int solesCoincidencias = coincidenciaSoles(solesCliente);
-
         return "Aciertos -> Números: " + numCoincidencias + "/5 | Soles: " + solesCoincidencias + "/2";
     }
 
